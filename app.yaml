@@ -1,0 +1,10 @@
+runtime: nodejs14
+
+env_variables:
+  NODE_ENV: 'production'
+
+handlers:
+  - url: /static
+    static_dir: public
+  - url: /
+    script: auto
