@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: mi-servicio-web
+    rootDirectory: . 
+    buildCommand: "npm install" 
+    startCommand: "node index.js"
