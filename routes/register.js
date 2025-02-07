@@ -175,35 +175,29 @@ router.post('/registrar-admin', async (req, res) => {
     correoElectronico,
     contraseñaUsuario,
     direccionUsuario,
-    ciudadUsuario, // Cambiado de 'ciudad' a 'ciudadUsuario'
-    estadoUsuario, // Cambiado de 'estado' a 'estadoUsuario'
-    codigoPostalUsuario, // Cambiado de 'codigoPostal' a 'codigoPostalUsuario'
+    ciudad, // Nombre consistente con la tabla
+    estado, // Nombre consistente con la tabla
+    codigoPostal, // Nombre consistente con la tabla
   } = req.body;
 
-  // Validación: Asegurar que los campos requeridos están presentes
-  if (!nombreUsuario || !apellidoUsuario || !telefonoUsuario || !correoElectronico || !contraseñaUsuario) {
-    return res.status(400).json({ error: 'Los campos nombreUsuario, apellidoUsuario, telefonoUsuario, correoElectronico y contraseñaUsuario son obligatorios' });
+  // Validación de campos obligatorios
+  if (!nombreUsuario || !apellidoUsuario || !telefonoUsuario || !correoElectronico || !contraseñaUsuario || !direccionUsuario || !ciudad || !estado || !codigoPostal) {
+    return res.status(400).json({ error: 'Todos los campos son obligatorios' });
   }
 
   try {
-    // Hashear la contraseña
     const hashedPassword = await bcrypt.hash(contraseñaUsuario, 10);
 
-    // Asignar null a los campos opcionales si no están presentes
-    const direccion = direccionUsuario || null;
-    const ciudad = ciudadUsuario || null;
-    const estado = estadoUsuario || null;
-    const codigoPostal = codigoPostalUsuario || null;
-
-    // Insertar el usuario en la tabla Usuario con rol 'admin'
     const sql = `
       INSERT INTO Usuario (nombreUsuario, apellidoUsuario, telefonoUsuario, correoElectronico, contraseñaUsuario, direccionUsuario, ciudad, estado, codigoPostal, rolUsuario) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'admin')
     `;
-    await query(sql, [nombreUsuario, apellidoUsuario, telefonoUsuario, correoElectronico, hashedPassword, direccion, ciudad, estado, codigoPostal]);
+
+    await query(sql, [nombreUsuario, apellidoUsuario, telefonoUsuario, correoElectronico, hashedPassword, direccionUsuario, ciudad, estado, codigoPostal]);
 
     res.status(201).json({ message: 'Administrador registrado correctamente' });
   } catch (error) {
+    // Manejo de errores
     if (error.code === 'ER_DUP_ENTRY') {
       if (error.sqlMessage.includes('correoElectronico')) {
         return res.status(409).json({ error: 'El correo electrónico ya está en uso' });
